@@ -41,7 +41,7 @@ const Code = dynamic(() =>
     await Promise.allSettled([
       // Only add @ts-expect-error where TypeScript gives actual type errors
       import('prismjs/components/prism-markup.js'),
-      import('prismjs/components/prism-coffeescript.js'),
+      void import('prismjs/components/prism-coffeescript.js'),
       // @ts-ignore
       import('prismjs/components/prism-bash.js'),
       // @ts-ignore
@@ -56,8 +56,6 @@ const Code = dynamic(() =>
       import('prismjs/components/prism-java.js'),
       // @ts-ignore
       import('prismjs/components/prism-js-templates.js'),
-      // @ts-ignore
-      import('prismjs/components/prism-coffeescript.js'),
       // @ts-ignore
       import('prismjs/components/prism-diff.js'),
       // @ts-ignore
