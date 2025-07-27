@@ -17,77 +17,71 @@ export async function resolveNotionPage(
 
   if (rawPageId && rawPageId !== 'index') {
     pageId = parsePageId(rawPageId)!
+    console.log('🔍 resolveNotionPage: rawPageId →', rawPageId)
+    console.log('🔍 parsed pageId:', pageId)
 
     if (!pageId) {
-      // check if the site configuration provides an override or a fallback for
-      // the page's URI
-      const override =
-        pageUrlOverrides[rawPageId] || pageUrlAdditions[rawPageId]
-
+      const override = pageUrlOverrides[rawPageId] || pageUrlAdditions[rawPageId]
       if (override) {
         pageId = parsePageId(override)!
+        console.log('🔁 used override pageId:', pageId)
       }
     }
 
     const useUriToPageIdCache = true
     const cacheKey = `uri-to-page-id:${domain}:${environment}:${rawPageId}`
-    // TODO: should we use a TTL for these mappings or make them permanent?
-    // const cacheTTL = 8.64e7 // one day in milliseconds
-    const cacheTTL = undefined // disable cache TTL
+    const cacheTTL = undefined
 
     if (!pageId && useUriToPageIdCache) {
       try {
-        // check if the database has a cached mapping of this URI to page ID
         pageId = await db.get(cacheKey)
-
-        // console.log(`redis get "${cacheKey}"`, pageId)
+        console.log('💾 redis cache get:', cacheKey, '→', pageId)
       } catch (err: any) {
-        // ignore redis errors
-        console.warn(`redis error get "${cacheKey}"`, err.message)
+        console.warn('⚠️ redis get error:', err.message)
       }
     }
 
     if (pageId) {
       recordMap = await getPage(pageId)
+      console.log('✅ getPage result for ID:', pageId)
+      console.log('📦 collection keys:', Object.keys(recordMap?.collection || {}))
+      console.log('📦 block keys:', Object.keys(recordMap?.block || {}))
     } else {
-      // handle mapping of user-friendly canonical page paths to Notion page IDs
-      // e.g., /developer-x-entrepreneur versus /71201624b204481f862630ea25ce62fe
       const siteMap = await getSiteMap()
       pageId = siteMap?.canonicalPageMap[rawPageId]
 
       if (pageId) {
-        // TODO: we're not re-using the page recordMap from siteMaps because it is
-        // cached aggressively
-        // recordMap = siteMap.pageMap[pageId]
-
         recordMap = await getPage(pageId)
+        console.log('📌 fallback getPage result:', pageId)
+        console.log('📦 collection keys:', Object.keys(recordMap?.collection || {}))
+        console.log('📦 block keys:', Object.keys(recordMap?.block || {}))
 
         if (useUriToPageIdCache) {
           try {
-            // update the database mapping of URI to pageId
             await db.set(cacheKey, pageId, cacheTTL)
-
-            // console.log(`redis set "${cacheKey}"`, pageId, { cacheTTL })
+            console.log('💾 redis set:', cacheKey, '→', pageId)
           } catch (err: any) {
-            // ignore redis errors
-            console.warn(`redis error set "${cacheKey}"`, err.message)
+            console.warn('⚠️ redis set error:', err.message)
           }
         }
       } else {
-        // note: we're purposefully not caching URI to pageId mappings for 404s
         return {
           error: {
-            message: `Not found "${rawPageId}"`,
+            message: `❌ Notion page not found for "${rawPageId}"`,
             statusCode: 404
           }
         }
       }
     }
   } else {
+    // fallback: root page
     pageId = site.rootNotionPageId
+    console.log('🏠 Using rootNotionPageId:', pageId)
 
-    console.log(site)
     recordMap = await getPage(pageId)
+    console.log('✅ getPage result for root ID:', pageId)
+    console.log('📦 collection keys:', Object.keys(recordMap?.collection || {}))
+    console.log('📦 block keys:', Object.keys(recordMap?.block || {}))
   }
 
   const props: PageProps = { site, recordMap, pageId }

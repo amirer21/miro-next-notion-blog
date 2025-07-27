@@ -3,7 +3,7 @@ import {
   type SearchParams,
   type SearchResults
 } from 'notion-types'
-import { mergeRecordMaps } from 'notion-utils'
+import { mergeRecordMaps, parsePageId } from 'notion-utils'
 import pMap from 'p-map'
 import pMemoize from 'p-memoize'
 
@@ -19,7 +19,7 @@ import { getPreviewImageMap } from './preview-images'
 const getNavigationLinkPages = pMemoize(
   async (): Promise<ExtendedRecordMap[]> => {
     const navigationLinkPageIds = (navigationLinks || [])
-      .map((link) => link?.pageId)
+      .map((link) => parsePageId(link?.pageId))  // ✅ parsePageId 추가
       .filter(Boolean)
 
     if (navigationStyle !== 'default' && navigationLinkPageIds.length) {
@@ -43,12 +43,17 @@ const getNavigationLinkPages = pMemoize(
 )
 
 export async function getPage(pageId: string): Promise<ExtendedRecordMap> {
-  let recordMap = await notion.getPage(pageId)
+  const validPageId = parsePageId(pageId)
+
+  if (!validPageId) {
+    throw new Error(`❌ Invalid Notion page ID: ${pageId}`)
+  }
+
+  console.log('🛰️ [getPage] 호출됨:', validPageId)
+  let recordMap = await notion.getPage(validPageId)
+  console.log('✅ [getPage] 완료:', Object.keys(recordMap.block || {}).length, 'blocks')
 
   if (navigationStyle !== 'default') {
-    // ensure that any pages linked to in the custom navigation header have
-    // their block info fully resolved in the page record map so we know
-    // the page title, slug, etc.
     const navigationLinkRecordMaps = await getNavigationLinkPages()
 
     if (navigationLinkRecordMaps?.length) {
