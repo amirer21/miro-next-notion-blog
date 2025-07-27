@@ -1,9 +1,10 @@
-import {
+import { 
   type ExtendedRecordMap,
   type SearchParams,
   type SearchResults
 } from 'notion-types'
-import { mergeRecordMaps, parsePageId } from 'notion-utils'
+import { mergeRecordMaps } from 'notion-utils'
+import { parsePageId as parsePageId_ } from 'notion-utils'
 import pMap from 'p-map'
 import pMemoize from 'p-memoize'
 
@@ -16,10 +17,18 @@ import { getTweetsMap } from './get-tweets'
 import { notion } from './notion-api'
 import { getPreviewImageMap } from './preview-images'
 
+const parsePageId = (id: string | undefined | null): string | null => {
+  try {
+    return parsePageId_(id ?? '') as string | null
+  } catch {
+    return null
+  }
+}
+
 const getNavigationLinkPages = pMemoize(
   async (): Promise<ExtendedRecordMap[]> => {
     const navigationLinkPageIds = (navigationLinks || [])
-      .map((link) => parsePageId(link?.pageId))  // ✅ parsePageId 추가
+      .map((link) => parsePageId(link?.pageId))
       .filter(Boolean)
 
     if (navigationStyle !== 'default' && navigationLinkPageIds.length) {
