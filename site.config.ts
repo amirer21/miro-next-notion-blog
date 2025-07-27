@@ -11,7 +11,7 @@ export default siteConfig({
 
   // basic site info (required)
   name: 'Miro Dev Blog',
-  domain: 'localhost',
+  domain: 'miro-next-notion-blog.vercel.app',
   //name: 'Next.js Notion Starter Kit',
   //domain: 'nextjs-notion-starter-kit.transitivebullsh.it',
   author: 'amirer21',
