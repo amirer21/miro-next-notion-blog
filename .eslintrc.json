@@ -1,6 +1,10 @@
 {
   "root": true,
-  "extends": ["@fisch0920/eslint-config"],
+  "extends": [
+    "@fisch0920/eslint-config",
+    "next",
+    "next/core-web-vitals"
+  ],
   "rules": {
     "react/prop-types": "off",
     "unicorn/no-array-reduce": "off",
