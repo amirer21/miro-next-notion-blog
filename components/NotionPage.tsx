@@ -39,10 +39,9 @@ const Code = dynamic(() =>
   import('react-notion-x/build/third-party/code').then(async (m) => {
     // add / remove any prism syntaxes here
     await Promise.allSettled([
-      // @ts-ignore
-      import('prismjs/components/prism-markup-templating.js'),
-      // @ts-ignore
+      // Only add @ts-expect-error where TypeScript gives actual type errors
       import('prismjs/components/prism-markup.js'),
+      import('prismjs/components/prism-coffeescript.js'),
       // @ts-ignore
       import('prismjs/components/prism-bash.js'),
       // @ts-ignore
