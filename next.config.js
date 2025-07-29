@@ -9,6 +9,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 export default withBundleAnalyzer({
+  allowedDevOrigins: ['localhost:3001', '127.0.0.1:3001'],
   staticPageGenerationTimeout: 300,
   images: {
     remotePatterns: [
