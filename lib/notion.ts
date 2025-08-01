@@ -58,7 +58,15 @@ export async function getPage(pageId: string): Promise<ExtendedRecordMap> {
   }
 
   console.log('🛰️ [getPage] 호출됨:', validPageId)
-  let recordMap = await notion.getPage(validPageId)
+  let recordMap;
+  try {
+    recordMap = await notion.getPage(validPageId);
+    console.log('✅ notion.getPage returned');
+  } catch(e) {
+    console.error('❌ notion.getPage threw error:', e);
+  }
+  console.log('recordMap.block keys:', Object.keys(recordMap.block || {}).slice(0,10))
+  console.log('recordMap.collection keys:', Object.keys(recordMap.collection || {}).slice(0,10))
   console.log('✅ [getPage] 완료:', Object.keys(recordMap.block || {}).length, 'blocks')
 
   if (navigationStyle !== 'default') {
