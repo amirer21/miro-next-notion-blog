@@ -65,6 +65,7 @@ export async function getPage(pageId: string): Promise<ExtendedRecordMap> {
   } catch (err) {
     console.error('❌ notion.getPage threw error:', err);
   }
+  console.log('🔍 block count:', Object.keys(recordMap.block || {}).length)
   console.log('recordMap.block keys:', Object.keys(recordMap.block || {}).slice(0,10))
   console.log('recordMap.collection keys:', Object.keys(recordMap.collection || {}).slice(0,10))
   console.log('✅ [getPage] 완료:', Object.keys(recordMap.block || {}).length, 'blocks')
