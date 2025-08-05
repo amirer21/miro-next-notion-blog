@@ -2,6 +2,7 @@ import type { PageProps } from '@/lib/types'
 import { NotionPage } from '@/components/NotionPage'
 import { domain } from '@/lib/config'
 import { resolveNotionPage } from '@/lib/resolve-notion-page'
+import { CategorySidebar } from '@/components/CategorySidebar'  // 추가!
 
 //export const getStaticProps = async () => {
 export const getStaticProps = async () => {
@@ -21,12 +22,25 @@ export const getStaticProps = async () => {
 }
 
 
-export default function NotionDomainPage(props: PageProps) {
-  console.log('🧩 NotionPage props:', {
-    pageId: props.pageId,
-    recordMap: props.recordMap,
-    blockCount: Object.keys(props.recordMap?.block || {}).length
-  })
+// export default function NotionDomainPage(props: PageProps) {
+//   console.log('🧩 NotionPage props:', {
+//     pageId: props.pageId,
+//     recordMap: props.recordMap,
+//     blockCount: Object.keys(props.recordMap?.block || {}).length
+//   })
 
-  return <NotionPage {...props} />
+//   return <NotionPage {...props} />
+// }
+export default function NotionDomainPage(props: PageProps) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
+      {/* 1. 사이드바에 recordMap 등 필요한 데이터 전달 */}
+      <CategorySidebar recordMap={props.recordMap} />
+
+      {/* 2. 기존 NotionPage 메인 콘텐츠 */}
+      <main style={{ flex: 1 }}>
+        <NotionPage {...props} />
+      </main>
+    </div>
+  )
 }
